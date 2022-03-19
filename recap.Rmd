@@ -1,0 +1,79 @@
+---
+title: "dpylr recap"
+author: "lumuli ken"
+date: "3/18/2022"
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Recap on Data analysis
+
+```{r fig.height=480, fig.width=600}
+library(ggplot2)
+library(dplyr)
+
+df <-as_tibble(mtcars)
+
+df
+```
+
+```{r}
+df %>%
+  summarise(mean(disp))
+```
+
+```{r}
+## sorting and arranging
+df%>%
+  arrange(desc(disp), desc(mpg))
+```
+
+```{r}
+## obtain the firts column
+df%>%
+  pull(1)
+```
+
+```{r}
+## obtain sliced portion
+df %>%
+  slice(10:5)
+```
+
+```{r}
+#get cars with more than 3 gears and plot output
+attach(df)
+df%>%
+  filter(gear>2) %>%
+  arrange(desc(mpg)) %>%
+  ggplot(aes(x=mpg, y=qsec))+geom_point(show.legend = TRUE, color=cyl, size=5)
+
+```
+
+```{r}
+## build simple linear regression model
+
+attach(df)
+model<- lm(qsec~mpg)
+# present summary summary(model)
+
+df%>%
+  mutate(mod=list(model)) %>%
+  mutate(pred=predict(model)) %>%
+  summarise(rmse=sqrt(mean(pred-qsec)**2), rsquared=summary(model)$r.squared)
+```
+
+```{r}
+df%>%
+  ggplot(aes(x=mpg, y=qsec))+geom_point(show.legend = TRUE, color=cyl, size=5)+
+  geom_line(aes(x=mpg, y=pred))
+```
+```{r}
+df%>%
+  unique()
+```
